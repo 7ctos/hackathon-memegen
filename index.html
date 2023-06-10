@@ -7,6 +7,20 @@
     </form>
     <img id="image" src="/image">
     <script>
+
+            // fetch('/list')
+            // .then(response => response.text())  // Parse the data as text
+            // .then(data => {
+                
+            //     console.log(data);  // Log the data to the console
+
+                
+            // })
+            // .catch((error) => {
+            //     console.error('Error:', error);
+            // });
+
+
         document.getElementById('text-form').onsubmit = function(e) {
             e.preventDefault();
 
@@ -21,6 +35,9 @@
             .then(image => {
                 document.getElementById('image').src = URL.createObjectURL(image);
             });
+
+           
+
         };
     </script>
 </body>

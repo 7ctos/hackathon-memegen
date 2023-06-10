@@ -81,9 +81,11 @@ func main() {
 			log.Fatal(err)
 		}
 
+		w.Write([]byte("["))
 		for _, file := range files {
-			w.Write([]byte("<a href='" + file + "'>" + file + "</a><br>" + "\n"))
+			w.Write([]byte("'/images/" + file + "',"))
 		}
+		w.Write([]byte("]"))
 
 		//w.Write([]byte("Hello, server is running!"))
 	})
