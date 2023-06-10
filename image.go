@@ -41,17 +41,35 @@ func createImage(text, position string) ([]byte, error) {
 	// Determine the position of the text
 	margin := 20.0
 	width := float64(dc.Width()) - 2*margin
-	x := margin
-	var y float64
+	var x, y float64
+	lineHeight := 1.5
+	lines := dc.WordWrap(text, width)
+	textHeight := float64(len(lines)) * dc.FontHeight() * lineHeight
+
 	switch position {
+	case "left-top":
+		x = margin
+		y = margin + textHeight
 	case "right-top":
 		x = float64(dc.Width()) - margin
+		y = margin + textHeight
 	case "left-bottom":
+		x = margin
+		y = float64(dc.Height()) - margin
+	case "right-bottom":
+		x = float64(dc.Width()) - margin
 		y = float64(dc.Height()) - margin
 	}
 
 	// Draw the text on the image
-	dc.DrawStringWrapped(text, x, y, 0, 0, width, 1.5, gg.AlignLeft)
+	for i, line := range lines {
+		if position == "right-top" || position == "right-bottom" {
+			width, _ := dc.MeasureString(line)
+			dc.DrawString(line, x-width, y-float64(len(lines)-i)*dc.FontHeight()*lineHeight)
+		} else {
+			dc.DrawString(line, x, y-float64(len(lines)-i)*dc.FontHeight()*lineHeight)
+		}
+	}
 
 	buf := new(bytes.Buffer)
 	err = png.Encode(buf, dc.Image())
