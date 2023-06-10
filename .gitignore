@@ -19,3 +19,15 @@
 
 # Go workspace file
 go.work
+
+
+# allow GIT to track tasks & extensions
+.vscode/*
+!.vscode/tasks.json
+!.vscode/extensions.json
+
+
+# OS files
+.DS_Store
+Thumbs.db
+
