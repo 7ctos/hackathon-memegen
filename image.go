@@ -39,7 +39,11 @@ func createImage(text string) ([]byte, error) {
 	dc.SetRGB(1, 1, 1) // White color
 
 	// Draw the text on the image
-	dc.DrawStringAnchored(text, 100, 100, 0.5, 0.5)
+	margin := 20.0
+	width := float64(dc.Width()) - 2*margin
+	x := margin
+	y := margin
+	dc.DrawStringWrapped(text, x, y, 0, 0, width, 1.5, gg.AlignLeft)
 
 	buf := new(bytes.Buffer)
 	err = png.Encode(buf, dc.Image())
