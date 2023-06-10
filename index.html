@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <form id="text-form">
+        <input type="text" id="text-input" name="text" value="Hello, World!">
+        <input type="submit" value="Update Image">
+    </form>
+    <img id="image" src="/image">
+    <script>
+        document.getElementById('text-form').onsubmit = function(e) {
+            e.preventDefault();
+
+            fetch('/image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams(new FormData(e.target)),
+            })
+            .then(response => response.blob())
+            .then(image => {
+                document.getElementById('image').src = URL.createObjectURL(image);
+            });
+        };
+    </script>
+</body>
+</html>

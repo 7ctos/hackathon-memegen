@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"image"
 	"image/png"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 
 	"github.com/fogleman/gg"
@@ -29,7 +31,7 @@ func createImage(text string) ([]byte, error) {
 	dc := gg.NewContextForImage(existingImg)
 
 	// Load the font file
-	if err := dc.LoadFontFace("/Library/Fonts/Arial Unicode.ttf", 32); err != nil {
+	if err := dc.LoadFontFace("/Library/Fonts/Arial Unicode.ttf", 32); err != nil { // Specify the path to your desired font file
 		return nil, err
 	}
 
@@ -50,16 +52,30 @@ func createImage(text string) ([]byte, error) {
 
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello, server is running!"))
+		http.ServeFile(w, r, "index.html")
 	})
 
 	http.HandleFunc("/image", func(w http.ResponseWriter, r *http.Request) {
-		query := r.URL.Query()
 
-		// Get the value for a specific key, "key"
-		value := query.Get("text")
+		var text string
+		if r.Method == http.MethodPost {
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			values, err := url.ParseQuery(string(body))
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			text = values.Get("text")
+		} else {
+			text = "Hello, World!"
+		}
 
-		img, err := createImage(value)
+		img, err := createImage(text)
+
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
