@@ -49,10 +49,10 @@ func createImage(text, position string) ([]byte, error) {
 	switch position {
 	case "left-top":
 		x = margin
-		y = margin + textHeight
+		y = margin + textHeight + dc.FontHeight() // Added vertical padding
 	case "right-top":
 		x = float64(dc.Width()) - margin
-		y = margin + textHeight
+		y = margin + textHeight + dc.FontHeight() // Added vertical padding
 	case "left-bottom":
 		x = margin
 		y = float64(dc.Height()) - margin
