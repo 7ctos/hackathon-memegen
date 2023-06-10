@@ -11,7 +11,7 @@ import (
 	"github.com/fogleman/gg"
 )
 
-func createImage() ([]byte, error) {
+func createImage(text string) ([]byte, error) {
 	// Open the existing image file
 	existingImgFile, err := os.Open("valley.jpg")
 	if err != nil {
@@ -37,7 +37,7 @@ func createImage() ([]byte, error) {
 	dc.SetRGB(1, 1, 1) // White color
 
 	// Draw the text on the image
-	dc.DrawStringAnchored("Hello, World!", 100, 100, 0.5, 0.5)
+	dc.DrawStringAnchored(text, 100, 100, 0.5, 0.5)
 
 	buf := new(bytes.Buffer)
 	err = png.Encode(buf, dc.Image())
@@ -54,11 +54,19 @@ func main() {
 	})
 
 	http.HandleFunc("/image", func(w http.ResponseWriter, r *http.Request) {
-		img, err := createImage()
+		query := r.URL.Query()
+
+		// Get the value for a specific key, "key"
+		value := query.Get("text")
+
+		img, err := createImage(value)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+
+		// Write the value to the HTTP response
+		//fmt.Fprintf(w, "Value: %s", value)
 
 		w.Header().Set("Content-Type", "image/png")
 		w.Write(img)
