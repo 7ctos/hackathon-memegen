@@ -62,6 +62,20 @@ func createImage(text, position string) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
+func ListFiles(directory string) ([]string, error) {
+	fileInfo, err := os.ReadDir(directory)
+	if err != nil {
+		return nil, err
+	}
+
+	var files []string
+	for _, file := range fileInfo {
+		files = append(files, file.Name())
+	}
+
+	return files, nil
+}
+
 func main() {
 	// Create a file server which serves files out of the "images" directory.
 	// Note: The file server is wrapped in the http.StripPrefix function to
