@@ -75,10 +75,6 @@ func main() {
 	fs := http.StripPrefix("/images/", http.FileServer(http.Dir("/images")))
 	http.Handle("/images/", fs)
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello, server is running!"))
-	})
-
 	http.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
 		files, err := ListFiles("images")
 		if err != nil {
