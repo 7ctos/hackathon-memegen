@@ -13,7 +13,7 @@ import (
 	"github.com/fogleman/gg"
 )
 
-func createImage(text string) ([]byte, error) {
+func createImage(text, position string) ([]byte, error) {
 	// Open the existing image file
 	existingImgFile, err := os.Open("valley.jpg")
 	if err != nil {
@@ -38,11 +38,19 @@ func createImage(text string) ([]byte, error) {
 	// Set the text color
 	dc.SetRGB(1, 1, 1) // White color
 
-	// Draw the text on the image
+	// Determine the position of the text
 	margin := 20.0
 	width := float64(dc.Width()) - 2*margin
 	x := margin
-	y := margin
+	var y float64
+	switch position {
+	case "right-top":
+		x = float64(dc.Width()) - margin
+	case "left-bottom":
+		y = float64(dc.Height()) - margin
+	}
+
+	// Draw the text on the image
 	dc.DrawStringWrapped(text, x, y, 0, 0, width, 1.5, gg.AlignLeft)
 
 	buf := new(bytes.Buffer)
@@ -52,20 +60,6 @@ func createImage(text string) ([]byte, error) {
 	}
 
 	return buf.Bytes(), nil
-}
-
-func ListFiles(directory string) ([]string, error) {
-	fileInfo, err := os.ReadDir(directory)
-	if err != nil {
-		return nil, err
-	}
-
-	var files []string
-	for _, file := range fileInfo {
-		files = append(files, file.Name())
-	}
-
-	return files, nil
 }
 
 func main() {
@@ -94,8 +88,7 @@ func main() {
 	})
 
 	http.HandleFunc("/image", func(w http.ResponseWriter, r *http.Request) {
-
-		var text string
+		var text, position string
 		if r.Method == http.MethodPost {
 			body, err := ioutil.ReadAll(r.Body)
 			if err != nil {
@@ -108,19 +101,17 @@ func main() {
 				return
 			}
 			text = values.Get("text")
+			position = values.Get("position")
 		} else {
 			text = "Hello, World!"
+			position = "left-top"
 		}
 
-		img, err := createImage(text)
-
+		img, err := createImage(text, position)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-
-		// Write the value to the HTTP response
-		//fmt.Fprintf(w, "Value: %s", value)
 
 		w.Header().Set("Content-Type", "image/png")
 		w.Write(img)
